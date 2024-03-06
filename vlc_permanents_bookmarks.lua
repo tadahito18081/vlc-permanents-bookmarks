@@ -26,7 +26,7 @@ end
 
 -- First function to be called when the extension is activated
 function activate()
-    vlc.msg.dbg("[Activate extension] Welcome! Start saving your bookmarks!")
+    vlc.msg.dbg("[VPB] [Activate extension] Welcome! Start saving your bookmarks!")
     local ok, err = pcall(check_config)
     if not ok then
         vlc.msg.err(err)
@@ -42,7 +42,7 @@ end
 
 -- Called when the extension is deactivated
 function deactivate()
-    vlc.msg.dbg("[Deactivate extension] Bye bye!")
+    vlc.msg.dbg("[VPB] [Deactivate extension] Bye bye!")
     if dialog_UI then
         dialog_UI:hide()
     end
@@ -61,7 +61,7 @@ end
 -- related to capabilities={"input-listener"} in descriptor()
 -- triggered by Start/Stop media input event
 function input_changed() -- ~ !important: deve essere qualcosa di veloce
-    vlc.msg.dbg("[Input changed]")
+    vlc.msg.dbg("[VPB] [Input changed]")
     if dialog_UI then
         dialog_UI:hide()
 
@@ -100,10 +100,10 @@ function load_bookmarks()
         if not mediaFile.name then
             mediaFile.name = filePath
         end
-        -- vlc.msg.dbg("Video Meta Title: " .. mediaFile.metaTitle)
-        vlc.msg.dbg("Video URI: " .. mediaFile.uri)
-        vlc.msg.dbg("fileName: " .. mediaFile.name)
-        vlc.msg.dbg("fileDir: " .. tostring(mediaFile.dir))
+        -- vlc.msg.dbg("[VPB] Video Meta Title: " .. mediaFile.metaTitle)
+        vlc.msg.dbg("[VPB] Video URI: " .. mediaFile.uri)
+        vlc.msg.dbg("[VPB] fileName: " .. mediaFile.name)
+        vlc.msg.dbg("[VPB] fileDir: " .. tostring(mediaFile.dir))
 
         getFileHash()
         if mediaFile.hash then
@@ -125,7 +125,7 @@ function getFileHash()
     local err
 
     -- Get data for hash calculation
-    vlc.msg.dbg("init read hash data from stream")
+    vlc.msg.dbg("[VPB] init read hash data from stream")
     local stream = vlc.stream(mediaFile.uri)
     data_start = stream:read(chunk_size)
     ok, size = pcall(stream.getsize, stream)
@@ -134,7 +134,7 @@ function getFileHash()
         return false
     end
     mediaFile.bytesize = size
-    vlc.msg.dbg("File bytesize: " .. mediaFile.bytesize)
+    vlc.msg.dbg("[VPB] File bytesize: " .. mediaFile.bytesize)
     -- size = math.floor(size / 2)
     ok, err = pcall(stream.seek, stream, size - chunk_size)
     if not ok then
@@ -143,7 +143,7 @@ function getFileHash()
     end
     data_end = stream:read(chunk_size)
     -- stream = nil
-    vlc.msg.dbg("finish Read hash data from stream")
+    vlc.msg.dbg("[VPB] finish Read hash data from stream")
 
     -- Hash calculation
     -- local lo = mediaFile.bytesize
@@ -172,7 +172,7 @@ function getFileHash()
     end
 
     mediaFile.hash = string.format("%08x%08x", hi, lo)
-    vlc.msg.dbg("File hash: " .. mediaFile.hash)
+    vlc.msg.dbg("[VPB] File hash: " .. mediaFile.hash)
     collectgarbage()
     return true
 end
@@ -198,7 +198,7 @@ function check_config()
     end
 
     if bookmarksDir then
-        vlc.msg.dbg("Bookmarks directory: " .. bookmarksDir)
+        vlc.msg.dbg("[VPB] Bookmarks directory: " .. bookmarksDir)
     end
 
     collectgarbage()
@@ -357,7 +357,7 @@ end
 -- GUI Setup and buttons callbacks ----------------------------------------
 -- Create the main bookmarks dialog
 function main_dialog()
-    vlc.msg.dbg("Creating main dialog")
+    vlc.msg.dbg("[VPB] Creating main dialog")
     -- Gui positional args: col, row, col_span, row_span, width, height
     dialog_UI = vlc.dialog(dialog_title)
 
@@ -531,7 +531,7 @@ function dlt_footer()
 end
 
 function close_dlg()
-    vlc.msg.dbg("Closing dialog")
+    vlc.msg.dbg("[VPB] Closing dialog")
     if dialog_UI ~= nil then
         -- dialog_UI:delete() -- Throw an error
         dialog_UI:hide()
@@ -556,7 +556,7 @@ function show_gui()
 end
 
 function noinput_dialog()
-    vlc.msg.dbg("Creating noinput dialog")
+    vlc.msg.dbg("[VPB] Creating noinput dialog")
     dialog_UI = vlc.dialog(dialog_title)
     dialog_UI:add_label(
         "<p style='font-size: 12px; text-align: center;'>Please open a media file before running this extension</p>")
